@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedra papel Tesoura</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="configuracoes">
+            <div>
+                <button aria-label="Ativar ou desativar som" id="button-sound">
+                   <img src="/assets/icons/sound-on.svg" alt="">
+                </button>
+                <span>Efeitos</span>
+            </div>
+           
+        
+           <div>
+               <button aria-label="Reiniciar placar" id="button-restart" type="reset">
+                   <img src="/assets/icons/restart-bold.svg" alt="">
+               </button> 
+               <span>Reiniciar</span>
+           </div>
+    </div>
+
+    <main>
+        <h1>Pedra • Papel • Tesoura</h1>
+        <p class="frase-sub">Faça sua escolha e enfrente o Computador !</p>
+
+        <div class="placar">
+            <div class="placar-usuario">
+               <h2>VOCÊ</h2>
+               <p id="score-user" class="score">0</p>
+               <p>Vitórias</p>
+            </div>
+
+             <span>VS</span>
+
+            <div class="placar-cpu">
+              <h2>CPU</h2>
+              <p id="score-cpu" class="score">0</p>
+              <p>Vitórias</p>
+            </div>
+        </div>
+
+        <div class="painel-batalha">
+            <h2>
+                <p id="result-msg">Faça sua jogada!</p>
+                <span>
+                    <img src="" alt="" id="emoji-resultado">
+                </span>
+            </h2>
+
+            <div class="main-items">
+                <div id="card-usuario" >
+                   <img src="assets/icons/punho-esquerdo.png" alt="punho esquerdo fechado" id="img-choice-usuario">
+                </div>
+
+                <span>VS</span>
+
+                <div id="card-cpu">
+                   <img src="/assets/icons/punho-direito.png" alt="punho direito fechado" id="img-choice-cpu">
+                </div>
+            </div>
+        </div>
+
+        <div class="painel-choices">
+               <button class="button-choice" id="pedra" arial-label="opção pedra" value="pedra">
+                   <img src="/assets/icons/rock_1faa8.png" alt="">
+                   <p>PEDRA</p>
+              </button>
+               
+               <button class="button-choice" id="papel" aria-label="opção papel" value="pedra">
+                   <img src="assets/icons/paper_1f4c4.png" alt="">
+                   <p>PAPEL</p>
+              </button>
+
+               <button class="button-choice" id="tesoura" aria-label="opção tesoura" value="pedra">
+                   <img src="/assets/icons/scissors_2702-fe0f.png" alt="">
+                   <p>TESOURA</p>
+              </button>
+        </div>
+        
+    </main>
+
+    <script type="module" src="js/main.js"></script>
+    
+</body>
+</html>
