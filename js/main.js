@@ -64,6 +64,12 @@ function salvarPlacar() {
     }));
 }
 
+// Limpar emoji sem deixar imagem quebrada
+function limparEmoji() {
+    emojiResultado.removeAttribute('src');
+    emojiResultado.hidden = true;
+}
+
 // Estado da rodada atual
 let rodadaAtual = null;
 
@@ -111,6 +117,7 @@ function aplicarEfeitoResultado(result) {
         case "Você venceu a rodada":
 
             emojiResultado.src = './assets/icons/emoji-win.png';
+            emojiResultado.hidden = false;
 
             resultMsg.classList.remove('msg-empate', 'msg-miss');
             resultMsg.classList.add('msg-win');
@@ -128,6 +135,7 @@ function aplicarEfeitoResultado(result) {
         case "Cpu venceu a rodada":
 
             emojiResultado.src = './assets/icons/cpu-win-emoji.png';
+            emojiResultado.hidden = false;
 
             resultMsg.classList.remove('msg-empate', 'msg-win');
             resultMsg.classList.add('msg-miss');
@@ -145,6 +153,7 @@ function aplicarEfeitoResultado(result) {
         default:
 
             emojiResultado.src = './assets/icons/emjoi-empate.png';
+            emojiResultado.hidden = false;
 
             resultMsg.classList.remove('msg-miss', 'msg-win');
             resultMsg.classList.add('msg-empate');
@@ -164,7 +173,7 @@ cardUsuario.addEventListener('animationstart', () => {
     imgChoiceEnemy.src = './assets/icons/punho-direito.png';
     imgChoiceUser.src = './assets/icons/punho-esquerdo.png';
 
-    emojiResultado.src = '';
+    limparEmoji();
 
     resultMsg.textContent = "Calculando resultado...";
 
@@ -250,7 +259,7 @@ resetarPlacar.addEventListener('click', () => {
     imgChoiceEnemy.src = './assets/icons/punho-direito.png';
     imgChoiceUser.src = './assets/icons/punho-esquerdo.png';
 
-    emojiResultado.src = '';
+    limparEmoji();
 
     resultMsg.innerText = 'Faça sua jogada!';
 
