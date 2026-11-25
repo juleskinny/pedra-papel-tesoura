@@ -1,28 +1,34 @@
-import { verificarVencedor, escolhaAleatoriaInimigo, REGRAS, OPCOES, placar } from "./script.js";
+::variant="standard" title="Código JavaScript corrigido" id="83152"}
+import { verificarVencedor, escolhaAleatoriaInimigo, placar } from "./script.js";
 
 let somAtivo = true;
 
-const somDerrota = new Audio('assets/musica e efeitos de som/lose-audio.m4a');
-const somVitoria = new Audio('assets/musica e efeitos de som/win-audio.mp3');
-const somEmpate = new Audio('assets/musica e efeitos de som/empate-audio.mp3');
+// Caminho dos arquivos
+const asset = (caminho) => new URL(`assets/${caminho}`, document.baseURI).href;
+
+// Áudios
+const somDerrota = new Audio(asset('musica e efeitos de som/lose-audio.m4a'));
+const somVitoria = new Audio(asset('musica e efeitos de som/win-audio.mp3'));
+const somEmpate = new Audio(asset('musica e efeitos de som/empate-audio.mp3'));
 
 function pararSons() {
-    somDerrota.pause();
-    somEmpate.pause();
-    somVitoria.pause();
-
-    somDerrota.currentTime = 0;
-    somEmpate.currentTime = 0;
-    somVitoria.currentTime = 0;
+    [somDerrota, somEmpate, somVitoria].forEach(som => {
+        som.pause();
+        som.currentTime = 0;
+    });
 }
 
 function tocarSom(som) {
     if (somAtivo) {
         pararSons();
-        som.play();
+
+        som.play().catch(erro => {
+            console.warn('Não foi possível reproduzir o áudio:', erro);
+        });
     }
 }
 
+// Elementos
 const resetarPlacar = document.querySelector('#button-restart');
 const buttonSound = document.querySelector('#button-sound');
 const buttonsoundOff = document.querySelector('#button-sound img');
@@ -42,10 +48,10 @@ const scoreCpu = document.querySelector("#score-cpu");
 const cardUsuario = document.querySelector('#card-usuario');
 const cardCpu = document.querySelector('#card-cpu');
 
-// Estado da rodada atual para os eventos de animação
+// Estado da rodada
 let rodadaAtual = null;
 
-// localstorage
+// LocalStorage
 const placarSalvo = JSON.parse(localStorage.getItem('placar'));
 
 if (placarSalvo) {
@@ -56,46 +62,27 @@ if (placarSalvo) {
 scoreUser.textContent = placar.jogador;
 scoreCpu.textContent = placar.inimigo;
 
+// Atualizar imagens
 function atualizarImagemJogada(cpuChoice, userChoice) {
-    switch (cpuChoice) {
-        case 'tesoura':
-            imgChoiceEnemy.src = 'assets/icons/scissors_2702-fe0f.png';
-            break;
 
-        case 'pedra':
-            imgChoiceEnemy.src = 'assets/icons/rock_1faa8.png';
-            break;
+    const imagens = {
+        tesoura: asset('icons/scissors_2702-fe0f.png'),
+        pedra: asset('icons/rock_1faa8.png'),
+        papel: asset('icons/paper_1f4c4.png')
+    };
 
-        case 'papel':
-            imgChoiceEnemy.src = 'assets/icons/paper_1f4c4.png';
-            break;
-
-        default:
-            break;
-    }
-
-    switch (userChoice) {
-        case 'tesoura':
-            imgChoiceUser.src = 'assets/icons/scissors_2702-fe0f.png';
-            break;
-
-        case 'pedra':
-            imgChoiceUser.src = 'assets/icons/rock_1faa8.png';
-            break;
-
-        case 'papel':
-            imgChoiceUser.src = 'assets/icons/paper_1f4c4.png';
-            break;
-
-        default:
-            break;
-    }
+    imgChoiceEnemy.src = imagens[cpuChoice];
+    imgChoiceUser.src = imagens[userChoice];
 }
 
+// Aplicar efeitos do resultado
 function aplicarEfeitoResultado(result) {
+
     switch (result) {
+
         case "Você venceu a rodada":
-            emojiResultado.src = 'assets/icons/emoji-win.png';
+
+            emojiResultado.src = asset('icons/emoji-win.png');
 
             resultMsg.classList.remove('msg-empate', 'msg-miss');
             resultMsg.classList.add('msg-win');
@@ -110,7 +97,8 @@ function aplicarEfeitoResultado(result) {
             break;
 
         case "Cpu venceu a rodada":
-            emojiResultado.src = 'assets/icons/cpu-win-emoji.png';
+
+            emojiResultado.src = asset('icons/cpu-win-emoji.png');
 
             resultMsg.classList.remove('msg-empate', 'msg-win');
             resultMsg.classList.add('msg-miss');
@@ -125,7 +113,8 @@ function aplicarEfeitoResultado(result) {
             break;
 
         default:
-            emojiResultado.src = 'assets/icons/emjoi-empate.png';
+
+            emojiResultado.src = asset('icons/emjoi-empate.png');
 
             resultMsg.classList.remove('msg-miss', 'msg-win');
             resultMsg.classList.add('msg-empate');
@@ -138,40 +127,50 @@ function aplicarEfeitoResultado(result) {
     }
 }
 
-// Listeners registrados uma única vez fora do loop de cliques
+// Início da animação
 cardUsuario.addEventListener('animationstart', () => {
-    imgChoiceEnemy.src = 'assets/icons/punho-direito.png';
-    imgChoiceUser.src = 'assets/icons/punho-esquerdo.png';
+
+    imgChoiceEnemy.src = asset('icons/punho-direito.png');
+    imgChoiceUser.src = asset('icons/punho-esquerdo.png');
 
     emojiResultado.src = '';
+
     resultMsg.textContent = "Calculando resultado...";
+
     resultMsg.classList.remove('msg-miss', 'msg-win', 'msg-empate');
 
     cardUsuario.classList.remove('card-miss', 'card-win');
     cardCpu.classList.remove('card-win', 'card-miss');
 });
 
+// Fim da animação
 cardUsuario.addEventListener('animationend', () => {
+
     if (!rodadaAtual) return;
 
-    /*aplica os efeitos de ganho e perda*/
     resultMsg.textContent = rodadaAtual.resultado;
 
-    atualizarImagemJogada(rodadaAtual.inimigoJogada, rodadaAtual.usuarioJogada);
+    atualizarImagemJogada(
+        rodadaAtual.inimigoJogada,
+        rodadaAtual.usuarioJogada
+    );
+
     aplicarEfeitoResultado(rodadaAtual.resultado);
 
-    /*atualiza o placar*/
     scoreUser.textContent = placar.jogador;
     scoreCpu.textContent = placar.inimigo;
 });
 
-// game
+// Jogo
 cardsChoices.forEach(card => {
+
     card.addEventListener('click', (event) => {
+
         const botao = event.target.closest('button');
+
         if (!botao) return;
 
-        // evento e animação quando o usuario clica em algum card de escolha
+        // Reiniciar animações
         [cardCpu, cardUsuario].forEach(players => {
             players.classList.remove('batalha');
             resultMsg.classList.remove('result-animation');
@@ -181,19 +180,23 @@ cardsChoices.forEach(card => {
             void players.offsetWidth
         );
 
+        // Iniciar animações
         [cardCpu, cardUsuario].forEach(players => {
             players.classList.add('batalha');
             resultMsg.classList.add('result-animation');
         });
-        /*==============================================================*/
 
         const usuarioJogada = botao.id;
         const inimigoJogada = escolhaAleatoriaInimigo();
-        const resultado = verificarVencedor(usuarioJogada, inimigoJogada);
+
+        const resultado = verificarVencedor(
+            usuarioJogada,
+            inimigoJogada
+        );
 
         placar.registrar(resultado);
 
-        // salvar pontuação
+        // Salvar pontuação
         localStorage.setItem('placar', JSON.stringify({
             jogador: placar.jogador,
             inimigo: placar.inimigo
@@ -207,21 +210,23 @@ cardsChoices.forEach(card => {
     });
 });
 
-// resete placar
+// Resetar placar
 resetarPlacar.addEventListener('click', () => {
+
     placar.resetar();
+
     rodadaAtual = null;
 
     pararSons();
 
-    // limpar localstorage
     localStorage.setItem('placar', JSON.stringify({
         jogador: placar.jogador,
         inimigo: placar.inimigo
     }));
 
-    imgChoiceEnemy.src = 'assets/icons/punho-direito.png';
-    imgChoiceUser.src = 'assets/icons/punho-esquerdo.png';
+    imgChoiceEnemy.src = asset('icons/punho-direito.png');
+    imgChoiceUser.src = asset('icons/punho-esquerdo.png');
+
     emojiResultado.src = '';
 
     resultMsg.innerText = 'Faça sua jogada!';
@@ -235,14 +240,19 @@ resetarPlacar.addEventListener('click', () => {
     scoreCpu.textContent = placar.inimigo;
 });
 
-// ativar e desativar som
+// Ativar e desativar som
 buttonSound.addEventListener('click', () => {
+
     somAtivo = !somAtivo;
 
     if (!somAtivo) {
+
         pararSons();
-        buttonsoundOff.src = 'assets/icons/sound-off.svg';
+
+        buttonsoundOff.src = asset('icons/sound-off.svg');
+
     } else {
-        buttonsoundOff.src = 'assets/icons/sound-on.svg';
+
+        buttonsoundOff.src = asset('icons/sound-on.svg');
     }
 });
