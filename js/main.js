@@ -73,6 +73,9 @@ function limparEmoji() {
 // Estado da rodada atual
 let rodadaAtual = null;
 
+// Controle para impedir múltiplos cliques
+let rodadaEmAndamento = false;
+
 function atualizarImagemJogada(cpuChoice, userChoice) {
 
     switch (cpuChoice) {
@@ -184,9 +187,15 @@ cardUsuario.addEventListener('animationstart', () => {
 });
 
 // Fim da animação
-cardUsuario.addEventListener('animationend', () => {
+cardUsuario.addEventListener('animationend', (event) => {
 
-    if (!rodadaAtual) return;
+    // Ignorar animações de outros elementos
+    if (event.target !== cardUsuario) return;
+
+    if (!rodadaAtual) {
+        rodadaEmAndamento = false;
+        return;
+    }
 
     resultMsg.textContent = rodadaAtual.resultado;
 
@@ -200,6 +209,9 @@ cardUsuario.addEventListener('animationend', () => {
     // Atualizar placar
     scoreUser.textContent = placar.jogador;
     scoreCpu.textContent = placar.inimigo;
+
+    // Liberar próxima jogada
+    rodadaEmAndamento = false;
 });
 
 // Jogo
@@ -208,7 +220,12 @@ cardsChoices.forEach(card => {
     card.addEventListener('click', (event) => {
 
         const botao = event.target.closest('button');
-        if (!botao) return;
+
+        // Impedir cliques durante uma rodada
+        if (!botao || rodadaEmAndamento) return;
+
+        // Bloquear novas jogadas
+        rodadaEmAndamento = true;
 
         // Reiniciar animações
         [cardCpu, cardUsuario].forEach(players => {
@@ -250,6 +267,7 @@ resetarPlacar.addEventListener('click', () => {
     placar.resetar();
 
     rodadaAtual = null;
+    rodadaEmAndamento = false;
 
     pararSons();
 
@@ -263,10 +281,10 @@ resetarPlacar.addEventListener('click', () => {
 
     resultMsg.innerText = 'Faça sua jogada!';
 
-    resultMsg.classList.remove('msg-miss', 'msg-win', 'msg-empate');
+    resultMsg.classList.remove('msg-miss', 'msg-win', 'msg-empate', 'result-animation');
 
-    cardUsuario.classList.remove('card-miss', 'card-win');
-    cardCpu.classList.remove('card-win', 'card-miss');
+    cardUsuario.classList.remove('card-miss', 'card-win', 'batalha');
+    cardCpu.classList.remove('card-win', 'card-miss', 'batalha');
 
     scoreUser.textContent = placar.jogador;
     scoreCpu.textContent = placar.inimigo;
